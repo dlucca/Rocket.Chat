@@ -64,6 +64,29 @@ Cada mejora debe ser pequeña y conservar compatibilidad con Rocket.Chat. Para a
 
 El fork y la rama inicial están publicados en GitHub. El código fuente está disponible en la carpeta de trabajo Mexillum Chat. No hay un servidor iniciado ni un despliegue de Railway.
 
-En esta máquina existe Node 24.19.0 compatible; no se encontraron Meteor ni Docker en PATH durante la preparación. No se ha ejecutado instalación completa de dependencias, compilación ni pruebas funcionales. La configuración de Railway es una guía de preparación, no un despliegue verificado.
+Se instalaron Meteor 3.5.2 y las dependencias con Node 24.19.0 y Yarn 4.18.0. La compilación de paquetes compartidos terminó con 78 tareas correctas. Yarn normalizó ocho referencias de peer dependencies de workspaces desde sus versiones RC a las versiones estables declaradas en los manifiestos; no se actualizaron versiones de paquetes externos.
+
+El servidor se inició y se verificaron la respuesta de `/api/info` y el asistente de configuración en español. Login, canales, mensajes y adjuntos siguen pendientes de crear el primer administrador. El MongoDB integrado de Meteor es 7.0.16 y se limita a esta prueba local inicial; antes de validar producción se debe usar MongoDB 8.x compatible con Rocket.Chat 8.9. Docker sigue pendiente para generar una imagen de producción. La configuración de Railway es una guía de preparación, no un despliegue verificado.
+
+Para iniciar el entorno local después de activar Node compatible:
+
+```sh
+./scripts/mexillum/dev.sh
+```
+
+El script añade Meteor del directorio personal al PATH y establece nombre Mexillum, idioma español y registro público desactivado. El proxy HTTP escucha por defecto únicamente en `127.0.0.1:3000`. Ejecuta solo la aplicación Meteor, usando los paquetes ya compilados, para evitar watchers de todos los servicios. Después de editar librerías en `packages/`, recompilar los paquetes correspondientes o usar el comando `dev` original de la raíz.
+
+En esta máquina, si Node 24 no está activo en la terminal:
+
+```sh
+PATH="$HOME/.nvm/versions/node/v24.19.0/bin:$PATH" ./scripts/mexillum/dev.sh
+```
+
+La base local de Meteor vive en `apps/meteor/.meteor/local/` y está excluida de Git. No ejecutar `meteor reset` si se quiere conservar esa base.
 
 REA sigue instalado en el proyecto anterior y registrado en Codex. Para estudiar este repositorio usaremos directamente su código; reservaremos REA para investigar comportamiento o artefactos distribuidos cuando aporte evidencia útil.
+
+
+## Corrección inicial del arranque local
+
+La compilación de Livechat fallaba porque la llamada al shell y las rutas del script no admitían espacios en el checkout (`Mexillum Chat`). Se pasó el nombre del script como argumento independiente a `execFileSync` y se entrecomillaron sus rutas. Verificación: generación real de los assets de Livechat y arranque posterior del servidor desde la misma carpeta con espacios. La rama de Windows conserva su implementación original y no se verificó en macOS.
