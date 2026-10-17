@@ -1,6 +1,6 @@
 import type { IUser } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
-import { Users } from '@rocket.chat/models';
+import { Roles, Users } from '@rocket.chat/models';
 import { Accounts } from 'meteor/accounts-base';
 import { Match, check } from 'meteor/check';
 import { DDPRateLimiter } from 'meteor/ddp-rate-limiter';
@@ -9,6 +9,7 @@ import { Meteor } from 'meteor/meteor';
 import { trim } from '../../../lib/utils/stringUtils';
 import { RateLimiterClass as RateLimiter } from '../../lib/RateLimiter';
 import { passwordPolicy } from '../../lib/auth/passwordPolicy';
+import { isSetupWizardCompleted } from '../../lib/getSetupWizardParameters';
 import { validateInviteToken } from '../../lib/rooms/invites/validateInviteToken';
 import { validateEmailDomain } from '../../lib/validateEmailDomain';
 import { settings } from '../../settings';
@@ -66,7 +67,10 @@ export const registerUser = async (
 		}),
 	);
 
-	if (settings.get('Accounts_RegistrationForm') === 'Disabled') {
+	if (
+		settings.get('Accounts_RegistrationForm') === 'Disabled' &&
+		(isSetupWizardCompleted() || (await Roles.countUsersInRole('admin')) !== 0)
+	) {
 		throw new Meteor.Error('error-user-registration-disabled', 'User registration is disabled', {
 			method: 'registerUser',
 		});

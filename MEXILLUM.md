@@ -90,3 +90,7 @@ REA sigue instalado en el proyecto anterior y registrado en Codex. Para estudiar
 ## Corrección inicial del arranque local
 
 La compilación de Livechat fallaba porque la llamada al shell y las rutas del script no admitían espacios en el checkout (`Mexillum Chat`). Se pasó el nombre del script como argumento independiente a `execFileSync` y se entrecomillaron sus rutas. Verificación: generación real de los assets de Livechat y arranque posterior del servidor desde la misma carpeta con espacios. La rama de Windows conserva su implementación original y no se verificó en macOS.
+
+## Creación del primer administrador
+
+Con el registro público desactivado, `registerUser` admite únicamente el bootstrap: el asistente no debe estar completado y no puede existir un administrador. Una vez que exista uno, vuelve a aplicarse el bloqueo aunque el resto del asistente siga abierto. Se conservan la política de contraseñas y el rate limiting originales. Cinco pruebas unitarias cubren bootstrap, administrador existente, asistente completado, registro público explícito y fallo de consulta de roles.
